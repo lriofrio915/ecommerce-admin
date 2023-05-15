@@ -1,13 +1,30 @@
 import { useRouter } from "next/router";
-import Layout from "../../../components/Layout"
+import Layout from "@/components/Layout";
+import { useEffect } from "react";
+import ProductForm from "@/components/ProductForm";
+import axios from "axios";
+import { useState } from "react";
 
 export default function EditProductPage() {
-
+  const [productInfo, setProductInfo] = useState(null);
   const router = useRouter();
-  console.log({router});
+  const {id} = router.query;
+
+  useEffect(()=>{
+    if(!id){
+      return;
+    }
+    axios.get('/api/products?id='+id).then(response => {
+      setProductInfo(response.data);
+    });
+  }, [id]);
+
   return(
     <Layout>
-        Edit Product Here
+      <h1>Editar Producto</h1>
+      {productInfo && (
+        <ProductForm {...productInfo} />
+      )}
     </Layout>
   )
 }
