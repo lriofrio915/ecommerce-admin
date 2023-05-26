@@ -4,6 +4,7 @@ import axios from "axios";
 
 export default function Categories(){
   const [name, setName] = useState('');
+  const [parentCategory, setParentCategory] = useState('');
   const [categories, setCategories] = useState([]);
 
   function fetchCategories(){
@@ -18,7 +19,7 @@ export default function Categories(){
 
   async function saveCategory(ev){
     ev.preventDefault();
-    await axios.post('api/categories', {name});
+    await axios.post('api/categories', {name, parentCategory});
     setName('');
     fetchCategories();
   }
@@ -33,8 +34,17 @@ export default function Categories(){
           onChange= {ev => setName(ev.target.value)}
           className="mb-0"
           value={name}
-          
-          />
+        />
+        <select className="mb-0" onChange={ev => setParentCategory(ev.target.value)} value={parentCategory} >
+          <option value = "">
+            Sin categoría principal
+          </option>
+          {categories.length > 0 && categories.map(category => (
+            <option value={category._id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
         <button type='submit' className="btn-primary py-1">
           Guardar
         </button>
@@ -43,12 +53,14 @@ export default function Categories(){
         <thead>
           <tr>
             <td>Nombre de la categoría</td>
+            <td>Categoría principal</td>
           </tr>
         </thead>
         <tbody>
           {categories.length > 0 && categories.map(category => (
             <tr>
               <td>{category.name}</td>
+              <td>{category?.parent?.name}</td>
             </tr>
           ))}
         </tbody>
