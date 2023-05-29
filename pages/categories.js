@@ -1,8 +1,10 @@
 import Layout from "@/components/Layout";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { withSwal } from "react-sweetalert2";
 
-export default function Categories(){
+function Categories({swal}){
+  const [editedCategory, setEditedCategory] = useState(null);
   const [name, setName] = useState('');
   const [parentCategory, setParentCategory] = useState('');
   const [categories, setCategories] = useState([]);
@@ -19,14 +21,51 @@ export default function Categories(){
 
   async function saveCategory(ev){
     ev.preventDefault();
-    await axios.post('api/categories', {name, parentCategory});
+    const data = {name, parentCategory}
+    if (editedCategory) {
+      data._id = editedCategory._id;
+      await axios.put('/api/categories', data);
+      setEditedCategory(null);
+    } else {
+      await axios.post('api/categories', data);
+    }
     setName('');
+    setParentCategory('');
     fetchCategories();
   }
+
+  function editCategory(category){
+    setEditedCategory(category);
+    setName(category.name);
+    setParentCategory(category.parent?._id);
+  }
+  
+  function deleteCategory(category){
+    swal.fire({
+      title: '¿Estás seguro?',
+      text: `¿Deseas eliminar ${category.name}?`,
+      showCancelButton: true,
+      cancelButtonText: 'Cancelar',
+      confirmButtonText: 'Si, eliminar',
+      confirmButtonColor: '#d55',
+      reverseButtons: true,
+  }).then(async result => {
+      if (result.isConfirmed) {
+        const {_id} = category;
+        await axios.delete('/api/categories?_id='+_id);
+        fetchCategories();
+      }
+  })
+  }
+
   return (
     <Layout>
       <h1>Categorías</h1>
-      <label>Nueva categoría</label>
+      <label>
+        {editedCategory
+          ? `Editar categoría ${editedCategory.name}`
+          : 'Crear nueva categoría'}
+      </label>
       <form onSubmit={saveCategory} className="flex gap-1">
         <input 
           type="text" 
@@ -54,6 +93,7 @@ export default function Categories(){
           <tr>
             <td>Nombre de la categoría</td>
             <td>Categoría principal</td>
+            <td></td>
           </tr>
         </thead>
         <tbody>
@@ -61,11 +101,20 @@ export default function Categories(){
             <tr>
               <td>{category.name}</td>
               <td>{category?.parent?.name}</td>
+              <td>
+                <button onClick={()=> editCategory(category)} className="btn-primary mr-1">Editar</button>
+                <button 
+                  onClick={()=> deleteCategory(category)}
+                  className="btn-primary">Eliminar</button>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
     </Layout>
-  )
-
+  );
 }
+
+export default withSwal(({swal}, ref) => (
+  <Categories swal={swal}/>
+));
