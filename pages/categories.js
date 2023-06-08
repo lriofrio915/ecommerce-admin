@@ -25,7 +25,7 @@ function Categories({ swal }) {
     const data = {
       name,
       parentCategory,
-      properties: properties.map(p => ({
+      properties: properties && properties.map(p => ({
         name: p.name,
         values: p.values.split(','),
       })),
@@ -77,7 +77,7 @@ function Categories({ swal }) {
 
   function addProperty() {
     setProperties(prev => {
-      return [...prev, { name: '', values: '' }];
+      return [...(prev || []), { name: '', values: '' }];
     });
   }
 
@@ -110,7 +110,7 @@ function Categories({ swal }) {
       <h1>Categorías</h1>
       <label>
         {editedCategory
-          ? `Edit category ${editedCategory.name}`
+          ? `Editar categoría: ${editedCategory.name}`
           : 'Crear nueva categoría'}
       </label>
       <form onSubmit={saveCategory}>
@@ -134,7 +134,7 @@ function Categories({ swal }) {
           </select>
         </div>
         <div className="mb-2">
-          <label className="block">Propiedadess</label>
+          <label className="block">Propiedades</label>
           <button
             onClick={addProperty}
             type="button"
@@ -142,7 +142,7 @@ function Categories({ swal }) {
           >
             Agregar nueva propiedad
           </button>
-          {properties.length > 0 && properties.map((property, index) => (
+          {properties && properties.length > 0 && properties.map((property, index) => (
             <div key={index} className="flex gap-1 mb-2">
               <input
                 type="text"
@@ -180,11 +180,11 @@ function Categories({ swal }) {
               }}
               className="btn-default"
             >
-              Cancel
+              Cancelar
             </button>
           )}
           <button type="submit" className="btn-primary py-1">
-            Save
+            Guardar
           </button>
         </div>
       </form>
