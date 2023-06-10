@@ -66,6 +66,17 @@ export default function ProductForm({
     setImages(images);
   }
 
+  const propertiesToFill = [];
+  if (categories.length > 0 && category) {
+    let catInfo = categories.find(({_id}) => _id === category);
+    propertiesToFill.push(...catInfo.properties);
+    while (catInfo?.parent?._id) {
+      const parentCat = categories.find(({_id}) => _id === catInfo?.parent?._id);
+      propertiesToFill.push(...parentCat.properties);
+      catInfo = parentCat;
+    }
+  }
+
   return (
     <form onSubmit={saveProduct}>
         <label>Nombre del producto</label>
@@ -85,6 +96,16 @@ export default function ProductForm({
             <option value={c._id}>{c.name}</option>
           ))}
         </select>
+        {propertiesToFill.length > 0 && propertiesToFill.map(p => (
+          <div className="flex gap-1">
+            <div>{p.name}</div>
+            <select>
+              {p.values.map(v => (
+                <option value={v}>{v}</option>
+              ))}
+            </select>
+          </div>
+        ))}
         <label>
           Fotos
         </label>
