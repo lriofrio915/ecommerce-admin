@@ -164,7 +164,7 @@ function Categories({ swal }) {
                 type="button"
                 className="btn-red"
               >
-                Remove
+                Remover
               </button>
             </div>
           ))}
