@@ -1,14 +1,19 @@
 import Link from "next/link"
 import Layout from "../components/Layout"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { useState } from "react";
+import Spinner from "@/components/Spinner";
 
 export default function Products() {
+
   const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(()=>{
+    setIsLoading(true);
     axios.get('/api/products').then (response => {
       setProducts(response.data);
+      setIsLoading(false);
     });
   }, []);
 
@@ -23,6 +28,17 @@ export default function Products() {
           </tr>
         </thead>
         <tbody>
+          
+          {isLoading && (
+            <tr>
+            <td colSpan={2}>
+              <div className="p-4">
+                <Spinner fullWidth={true}/>
+              </div>
+            </td>
+          </tr>
+          )}
+          
           {products.map(product => (
             <tr key={product._id}>
               <td>{product.title}</td>
