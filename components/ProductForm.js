@@ -23,11 +23,14 @@ export default function ProductForm({
   const [goToProducts, setGoToProducts] = useState(false);
   const [isUpLoading, setIsUpLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
   const router = useRouter();
 
   useEffect(()=>{
+    setCategoriesLoading(true);
     axios.get('/api/categories').then(result => {
       setCategories(result.data);
+      setCategoriesLoading(false);
     })
   }, []);
 
@@ -106,6 +109,9 @@ export default function ProductForm({
             <option value={c._id}>{c.name}</option>
           ))}
         </select>
+        {categoriesLoading && (
+          <Spinner />
+        )}
         {propertiesToFill.length > 0 && propertiesToFill.map(p => (
           <div key={p.name} className="">
             <label>{p.name[0].toUpperCase()+p.name.substring(1)}</label>
@@ -127,8 +133,8 @@ export default function ProductForm({
         </label>
         <div className="mb-2 flex flex-wrap gap-1">
           <ReactSortable 
-            className="flex flex-wrap gap-1"
             list={images} 
+            className="flex flex-wrap gap-1"
             setList={updateImagesOrder}>
             {!!images?.length && images.map(link =>(
               <div key={link} className="h-24 bg-white p-4 shadow-sm rounded-sm border border-gray-200">
